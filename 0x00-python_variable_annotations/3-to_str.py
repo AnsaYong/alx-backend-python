@@ -12,7 +12,7 @@ def to_str(n: float) -> str:
 
     Args:
         n (float): the float to convert to string representation.
-    
+
     Returns:
         str: the string representation of the float n.
     """

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-This module provides a function that takes two strings and returns a concatenated string.
+This module provides a function that takes two strings and
+returns a concatenated string.
 """
 
 
