@@ -27,11 +27,11 @@ async def wait_n(n: int, max_delay: int) -> list[float]:
         (i, result) for i, result in enumerate(results)
         if not isinstance(result, Exception)
         ]
-    
+
     # Initialize variables to track processed indices and delays
     processed_indices = set()
     sorted_delays = []
-    
+
     # Find the minimum delay in each iteration until all delays are processed
     while len(processed_indices) < len(delays_with_indices):
         min_delay = float('inf')
