@@ -3,12 +3,13 @@
 which takes 2 arguments and returns a list of delays.
 """
 import asyncio
+from typing import List
 
 
 wait_random = __import__('0-basic_async_syntax').wait_random
 
 
-async def wait_n(n: int, max_delay: int) -> list[float]:
+async def wait_n(n: int, max_delay: int) -> List[float]:
     """This function takes 2 arguments and spawns wait_random n times
 
     Args:
@@ -30,7 +31,7 @@ async def wait_n(n: int, max_delay: int) -> list[float]:
 
     # Initialize variables to track processed indices and delays
     processed_indices = set()
-    sorted_delays = []
+    delays = []
 
     # Find the minimum delay in each iteration until all delays are processed
     while len(processed_indices) < len(delays_with_indices):
@@ -40,7 +41,7 @@ async def wait_n(n: int, max_delay: int) -> list[float]:
             if i not in processed_indices and delay < min_delay:
                 min_delay = delay
                 min_index = i
-        sorted_delays.append(min_delay)
+        delays.append(min_delay)
         processed_indices.add(min_index)
 
-    return sorted_delays
+    return delays
