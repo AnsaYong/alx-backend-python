@@ -5,6 +5,7 @@ This module provides utilities for testing client.py.
 import unittest
 from unittest.mock import patch, Mock
 from parameterized import parameterized
+from parameterized import parameterized_class
 
 GithubOrgClient = __import__('client').GithubOrgClient
 
@@ -105,3 +106,52 @@ class TestGithubOrgClient(unittest.TestCase):
 
         # Assert that the has_license method returns the expected value
         self.assertEqual(result, expected)
+
+
+@parameterized_class(('org_payload', 'repos_payload', 'expected_repos',
+                      'apache2_repos'), [("org_payload_example",
+                                          "repos_payload_example",
+                                          ["repo1", "repo2"],
+                                          ["apache_repo1",
+                                           "apache_repo2"]),
+                                         ])
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """
+    Methods to test the GithubOrgClient class.
+
+    Methods:
+        - test_public_repos_with_license: Test the public_repos method of the
+            GithubOrgClient class.
+    """
+    @classmethod
+    def setUpClass(cls):
+        """
+        Set up the class with the required patchers.
+        """
+        # Mock requests.get to return org_payload and repos_payload
+        cls.get_patcher = patch('client.requests.get')
+        cls.mock_get = cls.get_patcher.start()
+        cls.mock_get.side_effect = [cls.org_payload, cls.repos_payload]
+
+    @classmethod
+    def tearDownClass(cls):
+        """
+        Clean up the class by stopping the patchers.
+        """
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """
+        Tests the public_repos method of the GithubOrgClient class.
+
+        Returns:
+            None
+        """
+        # Create an instance of the GithubOrgClient class
+        test_class = GithubOrgClient("google")
+
+        # Call the public_repos method
+        result = test_class.public_repos()
+
+        # Assert that the public_repos method returns the expected value
+        self.assertEqual(result, self.expected_repos)
