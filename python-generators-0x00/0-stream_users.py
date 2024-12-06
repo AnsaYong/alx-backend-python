@@ -16,13 +16,8 @@ def stream_users():
     connection = None
     cursor = None
     try:
-        # Establish a connection to the database
         connection = mysql.connector.connect()
-
-        # Create a cursor object
         cursor = connection.cursor()
-
-        # Execute the query to fetch all rows from the user_data table
         cursor.execute("SELECT user_id, name, email, age FROM user_data")
 
         # Fetch the column names from the cursor's description attribute
