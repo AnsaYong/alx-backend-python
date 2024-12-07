@@ -54,5 +54,5 @@ def batch_processing(batch_size):
         # Filter users older than 25
         filtered_batch = [user for user in batch if user["age"] > 25]
 
-        for user in filtered_batch:
-            print(user)
+        if filtered_batch:
+            yield filtered_batch

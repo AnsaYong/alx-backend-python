@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import sys
 
-processing = __import__("1-batch_processing")
+processing = __import__("1-batch_processing_local_mysqldb")
 
 ##### print processed users in a batch of 50
 try:
