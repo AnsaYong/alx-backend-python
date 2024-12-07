@@ -7,31 +7,31 @@ import functools
 
 
 # Decorator to log SQL queries
-def log_queries(func):
+def log_queries():
     """
-    Decorator to log SQL queries before executing them.
-
-    Args:
-        func: The function to be decorated.
+    A decorator to log SQL queries before executing the decorated function.
 
     Returns:
-        wrapper function that logs the query and then calls the original function.
+        A decorator function that wraps the target function.
     """
 
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        # Extract the query parameter from the function's arguments
-        query = (
-            kwargs.get("query") or args[0]
-        )  # Get query from kwargs or positional args
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Extract the query parameter from the function's arguments
+            query = (
+                kwargs.get("query") or args[0]
+            )  # Get query from kwargs or positional args
 
-        # Log the query before executing
-        print(f"Executing SQL query: {query}")
+            # Log the query before executing it
+            print(f"Executing SQL query: {query}")
 
-        # Call the original function and return its result
-        return func(*args, **kwargs)
+            # Call the original function and return its result
+            return func(*args, **kwargs)
 
-    return wrapper
+        return wrapper
+
+    return decorator
 
 
 # Function to fetch all users, decorated with log_queries
