@@ -19,13 +19,10 @@ async def async_fetch_older_users(db_name):
     """
     Fetch users older than 40.
     """
-    age_threshold = 40
     async with aiosqlite.connect(db_name) as db:
-        async with db.execute(
-            "SELECT * FROM users WHERE age > ?", (age_threshold,)
-        ) as cursor:
+        async with db.execute("SELECT * FROM users WHERE age > 40") as cursor:
             results = await cursor.fetchall()
-            print(f"Users older than {age_threshold}:")
+            print("Users older than 40:")
             for row in results:
                 print(row)
             return results
