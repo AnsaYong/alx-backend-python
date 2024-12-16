@@ -15,10 +15,11 @@ async def async_fetch_users(db_name):
             return results
 
 
-async def async_fetch_older_users(db_name, age_threshold):
+async def async_fetch_older_users(db_name):
     """
-    Fetch users older than the specified age.
+    Fetch users older than 40.
     """
+    age_threshold = 40
     async with aiosqlite.connect(db_name) as db:
         async with db.execute(
             "SELECT * FROM users WHERE age > ?", (age_threshold,)
@@ -34,9 +35,8 @@ async def fetch_concurrently(db_name):
     """
     Run both queries concurrently using asyncio.gather.
     """
-    age_threshold = 40
     all_users_task = async_fetch_users(db_name)
-    older_users_task = async_fetch_older_users(db_name, age_threshold)
+    older_users_task = async_fetch_older_users(db_name)
 
     # Run both tasks concurrently
     results = await asyncio.gather(all_users_task, older_users_task)
