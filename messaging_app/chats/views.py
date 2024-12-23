@@ -6,43 +6,25 @@ from serializers import MessageSerializer, ConversationSerializer
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
-    queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ["participants__username", "participants__email"]
+
+    def get_queryset(self):
+        return Conversation.objects.filter(participants_id=self.request.user_id)
 
     @action(detail=False, methods=["post"], url_path="create")
     def create_conversation(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        conversation = serializer.save()
+        conversation = serializer.save(
+            participants_id=[request.user_id]
+        )  # Include current user as participant
         return Response(
             self.get_serializer(conversation).data, status=status.HTTP_201_CREATED
         )
 
 
 class MessageViewSet(viewsets.ModelViewSet):
-    queryset = Message.objects.all()
     serializer_class = MessageSerializer
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ["sent_at"]
 
-    @action(detail=True, methods=["post"], url_path="send")
-    def send_message(self, request, pk=None):
-        try:
-            conversation = Conversation.objects.get(pk=pk)
-        except Conversation.DoesNotExist:
-            return Response(
-                {"detail": "Conversation not found."}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        data = request.data.copy()
-        data["sender"] = request.user.pk  # Assuming authentication is implemented
-        data["conversation"] = conversation.pk
-
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        message = serializer.save()
-        return Response(
-            self.get_serializer(message).data, status=status.HTTP_201_CREATED
-        )
+    def get_queryset(self):
+        return Message.objects.filter(sender_id=self.request.user_id)

@@ -18,9 +18,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.urls import urlpatterns as auth_urls
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("chats.urls")),
     path("api-auth/", include(auth_urls)),  # Added for DRF's built-in auth endpoints
+    path(
+        "api/auth/",
+        include(
+            [
+                path("login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+                path("refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+            ]
+        ),
+    ),
 ]
