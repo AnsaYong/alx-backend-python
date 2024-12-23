@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    sender_id = UserSerializer()
+    sender_id = serializers.CharField(source="user.user_id")
 
     class Meta:
         model = Message
@@ -27,3 +27,8 @@ class ConversationSerializer(serializers.ModelSerializer):
     def get_messages(self, obj):
         messages = obj.messages.all()
         return MessageSerializer(messages, many=True).data
+
+    def validate(self, data):
+        if not data.get("participants_id"):
+            raise serializers.ValidationError("A conversation must have participants.")
+        return data
