@@ -17,8 +17,10 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.urls import urlpatterns as auth_urls
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("chats.urls")),
+    path("api-auth/", include(auth_urls)),  # Added for DRF's built-in auth endpoints
 ]
