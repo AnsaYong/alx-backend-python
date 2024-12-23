@@ -1,4 +1,4 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Message, Conversation
@@ -8,6 +8,8 @@ from serializers import MessageSerializer, ConversationSerializer
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["participants__username", "participants__email"]
 
     @action(detail=False, methods=["post"], url_path="create")
     def create_conversation(self, request):
@@ -22,6 +24,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["sent_at"]
 
     @action(detail=True, methods=["post"], url_path="send")
     def send_message(self, request, pk=None):
