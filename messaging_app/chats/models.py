@@ -20,9 +20,7 @@ class user(AbstractUser):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["email"], name="unique_email")]
-        indexes = [
-            models.Index(fields=["email"], name="email_index"),
-        ]
+        indexes = [models.Index(fields=["email"], name="email_index")]
 
 
 class Message(models.Model):
