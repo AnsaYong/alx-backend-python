@@ -28,3 +28,22 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Message.objects.filter(sender_id=self.request.user_id)
+
+
+"""
+from rest_framework import viewsets
+from chats.permissions import IsParticipantOfConversation, IsMessageSender
+from .models import Conversation, Message
+
+class ConversationViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsParticipantOfConversation]
+
+    def get_queryset(self):
+        return Conversation.objects.filter(participants=self.request.user)
+
+class MessageViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsMessageSender]
+
+    def get_queryset(self):
+        return Message.objects.filter(sender=self.request.user)
+        """
