@@ -7,7 +7,7 @@ class RequestLoggingMiddleware:
         self.get_response = get_response
         # Configure logging
         logging.basicConfig(
-            filename="request.log", level=logging.INFO, format="%(message)s"
+            filename="requests.log", level=logging.INFO, format="%(message)s"
         )
 
     def __call__(self, request):
