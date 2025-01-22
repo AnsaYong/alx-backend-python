@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: django-container
-        image: messaging_app-web:latest  # Replace with a different Docker image name
+        image: messaging_app-web:2.0  # Replace with a different Docker image name
         ports:
         - containerPort: 8000
         env:

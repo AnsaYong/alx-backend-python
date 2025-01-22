@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Step 1: Apply the updated blue_deployment.yaml to trigger a rolling update
+echo "Applying the updated blue deployment (version 2.0)..."
+kubectl apply -f blue_deployment.yaml
+
+# Step 2: Monitor the rolling update progress
+echo "Monitoring the rolling update progress..."
+kubectl rollout status deployment/django-messaging-app-blue
+
+# Step 3: Use curl to test if the app experiences downtime during the update
+echo "Testing if the app experiences any downtime during the update..."
+while true; do
+  curl -s http://localhost:8000/  # Adjust this URL if needed (to your cluster service IP)
+  if [ $? -ne 0 ]; then
+    echo "App is down! There is a disruption during the update."
+    break
+  fi
+  echo "App is running..."
+  sleep 1  # Sending a request every second
+done
+
+# Step 4: Verify the rolling update is complete by checking the pods
+echo "Verifying the rolling update is complete..."
+kubectl get pods -l app=django-messaging-app,version=blue
+
+# Ensure all pods are running the new version
+echo "Check if all pods are running the updated version 2.0..."
+kubectl describe deployment django-messaging-app-blue | grep -i "Image"
