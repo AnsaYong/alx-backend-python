@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Step 1: Deploy Blue version
+echo "Deploying the Blue version of the app..."
+kubectl apply -f blue_deployment.yaml
+kubectl apply -f kubeservice.yaml
+
+# Step 2: Deploy Green version (but initially with 0 replicas)
+echo "Deploying the Green version of the app..."
+kubectl apply -f green_deployment.yaml
+
+# Step 3: Gradually scale up the Green version and scale down the Blue version
+echo "Scaling up the Green version and scaling down the Blue version..."
+kubectl scale deployment django-messaging-app-green --replicas=3
+kubectl scale deployment django-messaging-app-blue --replicas=0
+
+# Step 4: Verify that the Green version is working by checking logs
+echo "Checking logs for the Green version..."
+kubectl logs -l app=django-messaging-app,version=green --tail=20
+
+# Step 5: Update the Service to point to the Green version
+echo "Updating the Service to point to the Green version..."
+kubectl patch service django-messaging-service -p '{"spec":{"selector":{"version":"green"}}}'
+
+# Step 6: Verify the Service is now pointing to the Green version
+echo "Verifying the Service is now pointing to the Green version..."
+kubectl get svc django-messaging-service -o yaml
