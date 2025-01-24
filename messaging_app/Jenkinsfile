@@ -1,4 +1,4 @@
-line {
+pipeline {
     agent {
         docker { 
             image 'python:3.9' // Use a Python Docker image
@@ -23,17 +23,25 @@ line {
                 }
             }
         }
+        stage('Check Current Git Branch') {
+            steps {
+                script {
+                    // Run git branch to print the current branch
+                    sh 'git branch'  // Lists all branches and highlights the current one
+                }
+            }
+        }
         stage('Navigate to messaging_app') {
             steps {
                 dir('messaging_app') {
                     echo 'Switched to messaging_app directory'
                 }
             }
-        }
+        } 
         stage('Install Dependencies') {
             steps {
                 dir('messaging_app') {
-                    sh 'pip install -r requirements.txt'
+                    sh 'pip3 install -r messaging_apprequirements.txt'
                 }
             }
         }
