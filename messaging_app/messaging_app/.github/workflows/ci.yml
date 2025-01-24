@@ -1,0 +1,60 @@
+name: Django CI with MySQL
+
+on:
+  push:
+    branches:
+      - main  # Run on push to main branch (adjust if using a different branch)
+  pull_request:
+    branches:
+      - main  # Run on pull request to main branch (adjust if needed)
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu image
+
+    services:
+      mysql:
+        image: mysql:5.7  # MySQL version to use (adjust version as needed)
+        env:
+          MYSQL_ROOT_PASSWORD: root_password  # Set MySQL root password
+          MYSQL_DATABASE: test_db  # Set a test database name
+        ports:
+          - 3306:3306  # Expose MySQL port
+        options: --health-cmd="mysqladmin ping --silent" --health-start-period=10s --health-retries=3  # Health check for MySQL
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v2  # Checkout the repository
+
+    - name: Set up Python
+      uses: actions/setup-python@v2  # Set up Python environment
+      with:
+        python-version: '3.9'  # Adjust the version as needed
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r messaging_app/requirements.txt  # Install dependencies from your requirements file
+
+    - name: Wait for MySQL to be ready
+      run: |
+        # Wait for MySQL service to be ready before running tests
+        until mysqladmin ping -h 127.0.0.1 --silent; do
+          echo "Waiting for MySQL..."
+          sleep 5
+        done
+
+    - name: Set up database
+      run: |
+        # Set up the database and apply Django migrations
+        python messaging_app/manage.py migrate  # Apply migrations to MySQL
+
+    - name: Run tests
+      run: |
+        pytest --junitxml=report.xml  # Run the tests using pytest (adjust if using Django's manage.py test)
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v2  # Upload test results for later viewing
+      with:
+        name: test-report
+        path: report.xml  # The path where the test report is saved
