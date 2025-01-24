@@ -7,6 +7,8 @@ line {
     environment {
         GITHUB_CREDENTIALS_ID = '9b7ce7da-8bf5-4e59-8a1c-a707acc86908' // Credential ID (can be generated autmatically by jenkins)
         GITHUB_TOKEN = credentials('github-token') // GitHub token
+        DOCKER_REGISTRY = 'docker.io' // Docker registry (e.g., Docker Hub)
+        DOCKER_IMAGE_NAME = 'your-dockerhub-username/messaging-app' // Replace with your Docker Hub username and app name
     }
     stages {
         stage('Clone Repository') {
@@ -56,6 +58,40 @@ line {
             steps {
                 dir('messaging_app') {
                     junit 'report.xml' // Publish the test report
+                }
+            }
+        }
+
+        // Docker build and push stage
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image
+                    sh '''
+                    docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest .
+                    '''
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    // Login to Docker Hub using Jenkins credentials
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Push the Docker image to Docker Hub
+                    sh '''
+                    docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME:latest
+                    '''
                 }
             }
         }
