@@ -41,7 +41,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('messaging_app') {
-                    sh 'pip3 install -r messaging_apprequirements.txt'
+                    sh 'pip3 install -r messaging_app/requirements.txt'
                 }
             }
         }
