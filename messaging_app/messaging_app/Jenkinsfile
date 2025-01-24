@@ -1,0 +1,55 @@
+line {
+    agent {
+        docker { 
+            image 'python:3.9' // Use a Python Docker image
+        }
+    }
+    environment {
+        GITHUB_CREDENTIALS_ID = '9b7ce7da-8bf5-4e59-8a1c-a707acc86908' // Credential ID (can be generated autmatically by jenkins)
+        GITHUB_TOKEN = credentials('github-token') // GitHub token
+    }
+    stages {
+        stage('Clone Repository') {
+            steps {
+                script {
+                    checkout scm: [
+                        $class: 'GitSCM',
+                        branches: [[name: '*/main']], // Branch name
+                        userRemoteConfigs: [[
+                            url: 'https://$GITHUB_TOKEN@github.com/AnsaYong/alx-backend-python.git',
+                            credentialsId: GITHUB_CREDENTIALS_ID
+                        ]]
+                    ]
+                }
+            }
+        }
+        stage('Navigate to messaging_app') {
+            steps {
+                dir('messaging_app') {
+                    echo 'Switched to messaging_app directory'
+                }
+            }
+        }
+        stage('Install Dependencies') {
+            steps {
+                dir('messaging_app') {
+                    sh 'pip install -r requirements.txt'
+                }
+            }
+        }
+        stage('Run Tests') {
+            steps {
+                dir('messaging_app') {
+                    sh 'pytest --junitxml=report.xml'
+                }
+            }
+        }
+        stage('Publish Report') {
+            steps {
+                dir('messaging_app') {
+                    junit 'report.xml' // Publish the test report
+                }
+            }
+        }
+    }
+}
