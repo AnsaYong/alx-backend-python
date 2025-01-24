@@ -1,0 +1,42 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main  # Trigger this on push to the main branch (adjust as needed)
+  pull_request:
+    branches:
+      - main  # Trigger on pull request to the main branch (adjust as needed)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu image for the build
+
+    steps:
+    - name: Check out the code
+      uses: actions/checkout@v2  # Checkout the code
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2  # Set up Docker Buildx
+
+    - name: Cache Docker layers
+      uses: actions/cache@v2  # Cache Docker layers to speed up builds
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-docker-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-docker-
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2  # Log in to Docker Hub using credentials stored as GitHub secrets
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build Docker image
+      run: |
+        docker build -t yourusername/messaging-app:latest .  # Replace with your Docker Hub username/repo
+
+    - name: Push Docker image
+      run: |
+        docker push yourusername/messaging-app:latest  # Replace with your Docker Hub username/repo

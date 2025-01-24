@@ -1,4 +1,4 @@
-name: Django CI with MySQL
+name: Django CI with MySQL, Linting, and Coverage
 
 on:
   push:
@@ -49,10 +49,23 @@ jobs:
         # Set up the database and apply Django migrations
         python messaging_app/manage.py migrate  # Apply migrations to MySQL
 
+    - name: Run flake8 linting
+      run: |
+        pip install flake8  # Install flake8
+        flake8 messaging_app  # Run flake8 on your Django project directory
+      continue-on-error: false  # Fail the build if flake8 errors are detected
+
     - name: Run tests
       run: |
-        pytest --junitxml=report.xml  # Run the tests using pytest (adjust if using Django's manage.py test)
-      
+        pip install pytest pytest-cov  # Install pytest and coverage plugins
+        pytest --cov=messaging_app --cov-report=xml --junitxml=report.xml  # Run tests with coverage and generate report
+    
+    - name: Upload test coverage report
+      uses: actions/upload-artifact@v2  # Upload test coverage report as an artifact
+      with:
+        name: coverage-report
+        path: coverage.xml  # The path where the coverage report is saved
+
     - name: Upload test results
       uses: actions/upload-artifact@v2  # Upload test results for later viewing
       with:
